@@ -1,6 +1,5 @@
 (ns cassandra.AST
-  (:require [cassandra.utils :as utils :refer [third]]
-            [clojure.math.numeric-tower :refer [expt]]))
+  (:require [cassandra.utils :as utils :refer [third expt]]))
 
 (defn unary? [root]
   (= (count root) 2))
@@ -53,12 +52,12 @@
   (defn _stringify [root]
     (if (leaf? root)
       (case root
-        * ""
+        * "\\times"
         expt "^"
         (pr-str root))
       (cond
-        (= (second root)
-           '/) (format "\\frac{%s}{%s}" (stringify (first root)) (stringify (third root)))
+        ;(= (second root)
+        ;   '/) (format "\\frac{%s}{%s}" (stringify (first root)) (stringify (third root)))
         (= (second root)
            'expt) (format "%s^{%s}" (stringify (first root)) (stringify (third root)))
         :else (format "(%s)" (clojure.string/join " "

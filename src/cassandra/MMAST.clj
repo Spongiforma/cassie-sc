@@ -3,8 +3,7 @@
             [cassandra.calculus :as calculus]
             [cassandra.roots :as roots ]
             [cassandra.AST :refer [infix stringify]]
-            [cassandra.simplify :as simplify]
-            [clojure.math.numeric-tower :refer [expt]]))
+            [cassandra.utils :refer [expt]])
   (:gen-class
     :name cassandra.MMAST
     :methods [#^{:static true} [evaluate [String String] String]]))
@@ -17,15 +16,23 @@
 (defn -main [& args]
   (println (stringify
              (infix (let [input (simplify/pprocess (read-string (first args)))
-                    operation (second args)]
-                (case operation
-                  "simplify" (simplify/clean input)
-                  "differentiate" (calculus/differentiate input 'x)
-                  "newton-raphson" (roots/newton-raphson input 'x 0.01 3.555452)
-                  "distribute-power" (simplify/distribute-power input)
-                  "simpsons" (calculus/simpsons input 'x 100 (nth 2 args) (nth 3 args))
-                  "divide" (simplify/simplify (/ input (nth 2 args)))
-                  "times" (simplify/simplify (* input (nth 2 args)))
-                  "minus" (simplify/simplify (- input (nth 2 args)))
-                  "plus" (simplify/simplify (+ input (nth 2 args)))
-                  nil))))))
+                          operation (second args)
+                          arg1 (if (> (count args) 2)
+                                 (read-string (nth args 2))
+                                 nil)
+                          arg2 (if (> (count args) 3)
+                                 (read-string (nth args 3))
+                                 nil)]
+                      (case operation
+                        "simplify" (simplify/clean input)
+                        "differentiate" (calculus/differentiate input 'x)
+                        "newton-raphson" (roots/newton-raphson input 'x 0.01 3.555452)
+                        "distribute-power" (simplify/distribute-power input)
+                        "simpsons" (calculus/simpsons input 'x 10000 arg1 arg2)
+                        "divide" (simplify/simplify (list '/ input arg1))
+                        "times" (simplify/simplify (list '* input arg1))
+                        "minus" (simplify/simplify (list '- input arg1))
+                        "plus" (simplify/simplify (list '+ input arg1))
+                        "expt" (simplify/simplify (list 'expt input arg1))
+                        nil))))))
+;(-main "(- (expt x 2) 2)" "newton-raphson")

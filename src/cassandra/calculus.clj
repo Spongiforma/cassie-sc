@@ -1,7 +1,7 @@
 (ns cassandra.calculus
   (:require
     [cassandra.AST :as AST :refer [leaf? left-child right-child children]]
-    [cassandra.utils :as utils :refer [atom? third]]
+    [cassandra.utils :as utils :refer [atom? third expt]]
     [cassandra.simplify :as simplify]))
 
 (defn differentiate [root x]
@@ -30,12 +30,11 @@
                                                                                                          1))))))
                                                          (differentiate (left-child root) x))))))))
 (defn simpsons [root x n a b]
-  (let [h (/ (float (- b a)) n)
-        f #(eval (AST/substitute root x %))]
-    (/
-      (* h (+ (* 4 (apply + (map #(f (+ a (* % h)))
-                                 (filter even? (range 2 n)))))
-              (* 2 (apply + (map #(f (+ a (* % h)))
-                                 (filter odd? (range 1 n)))))))
-      3)))
-
+  (format "%.3f" (let [h (/ (float (- b a)) n)
+         f #(eval (AST/substitute root x %))]
+     (/
+       (* h (+ (* 4 (apply + (map #(f (+ a (* % h)))
+                                  (filter even? (range 2 n)))))
+               (* 2 (apply + (map #(f (+ a (* % h)))
+                                  (filter odd? (range 1 n)))))))
+       3))))

@@ -1,8 +1,7 @@
 (ns cassandra.simplify
   (:require
     [cassandra.AST :as AST :refer [leaf? left-child right-child children]]
-    [cassandra.utils :as utils :refer [atom? third]]
-    [clojure.math.numeric-tower :refer [expt]]))
+    [cassandra.utils :as utils :refer [atom? third expt]]))
 
 ;; http://www.math.wpi.edu/IQP/BVCalcHist/calc5.html
 
