@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="MMAST">
+    <CLASSES />
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/target/MMAST.jar!/" />
+    </SOURCES>
+  </library>
+</component>

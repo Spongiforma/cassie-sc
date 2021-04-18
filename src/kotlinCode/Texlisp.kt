@@ -1,12 +1,28 @@
-package cassandra
-import java.lang.Character.isDigit
+package kotlinCode
 import java.lang.Character.isWhitespace
 import java.util.*
 
+fun main(){
+}
 
-object TexToLisp{
+object TexLisp{
+
+    fun evaluate(input: String, operation: String) : String {
+//	    return MMAST.main(input,operation)
+	    return ""
+    }
 	private fun isDigitElement(input: Char) : Boolean {
-        return input.isDigit() || setOf('.','-').contains(input)
+        return input.isDigit() || setOf('.').contains(input)
+    }
+    private fun unaryNegateTree(root: Node?) : Node? {
+        return if(root==null){
+           null
+        } else if (root.isLeaf() && (root.name as Atom.NumberAtom).value.startsWith("-")){
+            val value =(root.name as Atom.NumberAtom).value.drop(1)
+            Node(Function.Negative(), Node(Atom.NumberAtom(value), null, null), null)
+        } else {
+            Node(root.name, unaryNegateTree(root.left), unaryNegateTree(root.right))
+        }
     }
 
     /**
@@ -15,16 +31,15 @@ object TexToLisp{
      * @param expression
      * @return A list of atoms
      */
-    private fun atomizeExpression(expression: String) : List<Atom> {
+    fun atomizeExpression(expression: String) : List<Atom> {
         if (expression.contains(" ")) // Strip whitespace
-            return atomizeExpression(expression.filterNot{ isWhitespace(it) })
+            return atomizeExpression(expression.filterNot { isWhitespace(it) })
 
         var prev = 0
         val atoms = mutableListOf<String>()
         for (i in expression.indices) {
             if(i < expression.length-1 &&
-                    (expression[i].isDigit() || expression[i] == '.') &&
-                    (expression[i+1].isDigit() || expression[i+1] == '.')){
+                    isDigitElement(expression[i]) && isDigitElement(expression[i + 1])){
                 continue
             }
             atoms.add(expression.substring(prev,i+1))
@@ -33,7 +48,18 @@ object TexToLisp{
         if(prev!=expression.length){
             atoms.add(expression.substring(prev))
         }
+
+        val rem = mutableSetOf<Int>()
         return atoms.map{ Atom.typeValue(it) }
+                .also {
+                    for (i in 1..it.size - 3) {
+                        if (it[i] is Operator && it[i + 1] is Operator.Minus && it[i + 2] is Atom.NumberAtom) {
+                            val tmp = (it[i + 2] as Atom.NumberAtom).value
+                            (it[i + 2] as Atom.NumberAtom).value = "-$tmp"
+                            rem.add(i+1)
+                        }
+                    }
+                }.filterIndexed { i,_ -> !rem.contains(i) }
     }
 
     /**
@@ -93,11 +119,11 @@ object TexToLisp{
         fun addNode(stack: Stack<Node>, operator: Atom){
             val right = stack.pop()
             val left = stack.pop()
-            stack.push(Node(operator,left,right))
+            stack.push(Node(operator, left, right))
         }
         for (atom in atoms){
             when (atom){
-                is Atom.NumberAtom -> operandStack.push(Node(atom,null,null))
+                is Atom.NumberAtom -> operandStack.push(Node(atom, null, null))
                 is Operator.LeftBracket -> operatorStack.push(atom)
                 is Operator.RightBracket -> {
                     while(operatorStack.isNotEmpty() && operatorStack.peek() !is Operator.LeftBracket) {
@@ -122,43 +148,7 @@ object TexToLisp{
         while(operatorStack.isNotEmpty()){
             addNode(operandStack,operatorStack.pop())
         }
-        return operandStack.pop()
-    }
-
-//    fun polishToTree(atoms: List<Atom>) : List<Int>{
-//        val stack = Stack<Int>()
-//        val par = mutableListOf<Int>()
-//        stack.push(-1)
-//        for (i in atoms.indices){
-//            par.add(stack.pop())
-//            if (atoms[i] is Operator){
-//                stack.push(i)
-//                stack.push(i)
-//            }
-//        }
-//        return par
-//    }
-//
-//    fun parentToAdjacencyList(atoms: List<Atom>, parent: List<Int>) : List<MutableList<Int>> {
-//        val adj = List<MutableList<Int>>(parent.size/2) {mutableListOf()}
-//        val edges = parent.mapIndexed{ v, p ->
-//            p to v
-//        }
-//        for (edge in edges){
-//            adj[edge.first].add(edge.second)
-//        }
-//        return adj
-//    }
-
-
-
-}
-fun main(){
-    while(true){
-        val p = readLine()
-        val ast =  TexToLisp.infixToAST(p!!)
-        println(ast)
-//        println(TexToLisp.polishToTree(polishAtoms).joinToString(","))
+        return unaryNegateTree(operandStack.pop())!!
     }
 }
 

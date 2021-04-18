@@ -1,8 +1,8 @@
-package cassandra
+package kotlinCode
 
 abstract class Atom{
 	companion object {
-		fun typeValue(inp: String) : Atom{
+		fun typeValue(inp: String) : Atom {
 			return when(inp){
 				"+" -> Operator.Plus()
 				"-" -> Operator.Minus()
@@ -11,13 +11,14 @@ abstract class Atom{
 				"(" -> Operator.LeftBracket()
 				")" -> Operator.RightBracket()
 				"^" -> Operator.Expn()
+				"\\sin" -> Function.Sine()
+				"\\Cos" -> Function.Cosine()
 				else -> NumberAtom(inp)
 			}
 		}
-
 	}
 	class NumberAtom (
-			val value: String
+			var value: String
 	) : Atom(){
 		override fun toString(): String {
 			return value
