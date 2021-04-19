@@ -52,7 +52,7 @@
   (defn _stringify [root]
     (if (leaf? root)
       (case root
-        * "\\times"
+        * "*"
         expt "^"
         (pr-str root))
       (cond
