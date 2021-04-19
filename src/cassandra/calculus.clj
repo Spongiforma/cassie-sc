@@ -9,7 +9,7 @@
     (concat
       (take n coll)
       (drop (inc n) coll)))
-  (simplify/simplify (cond (= 'x root) 1
+  (identity (cond (= 'x root) 1
          (leaf? root) 0
          :else (let [nchildren (map differentiate (children root) (repeat (count (children root))
                                                                           x))]
@@ -31,7 +31,7 @@
                                                          (differentiate (left-child root) x))))))))
 (defn simpsons [root x n a b]
   (format "%.3f" (let [h (/ (float (- b a)) n)
-         f #(eval (AST/substitute root x %))]
+         f #(AST/evaluate (AST/substitute root x %))]
      (/
        (* h (+ (* 4 (apply + (map #(f (+ a (* % h)))
                                   (filter even? (range 2 n)))))

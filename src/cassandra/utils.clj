@@ -34,10 +34,3 @@ Returns an exact number if the base is an exact number and the power is an integ
       :else (/ 1 (expt-int base (minus pow))))
     (Math/pow base pow)))
 
-(defn func [f]
-  (if (= f 'expt)
-    expt
-    (eval f)))
-
-(defn evaluate [expr]
-  )

@@ -64,3 +64,12 @@
                                                   (map stringify root))))))
   (condense-space (_stringify root)))
 
+(defn evaluate [root]
+  (defn op [f]
+    (if (= f 'expt)
+      expt
+      (eval f)))
+  (if (leaf? root)
+    root
+    (apply (op (value root))
+           (map evaluate (children root)))))

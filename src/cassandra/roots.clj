@@ -35,8 +35,8 @@ Returns an exact number if the base is an exact number and the power is an integ
 (defn newton-raphson [root x diff seed]
   (defn make-guess [prev-guess]
     (- prev-guess
-       (/ (float (eval (AST/substitute root x prev-guess)))
-          (eval (AST/substitute (calculus/differentiate root x) x prev-guess)))))
+       (/ (float (AST/evaluate (AST/substitute root x prev-guess)))
+          (AST/evaluate (AST/substitute (calculus/differentiate root x) x prev-guess)))))
   (defn _nr [guess]
     (let [new-guess (make-guess guess)]
       (if (< (/ (Math/abs (- guess new-guess))
@@ -45,7 +45,3 @@ Returns an exact number if the base is an exact number and the power is an integ
         new-guess
         (_nr new-guess))))
   (format "%.3f" (_nr seed)))
-(defn make-guess [root x prev-guess]
-  (- prev-guess
-     (/ (float (eval (AST/substitute '(exponent x 2) x prev-guess)))
-        (eval (AST/substitute (calculus/differentiate '(exponent x 2) x) x prev-guess)))))
