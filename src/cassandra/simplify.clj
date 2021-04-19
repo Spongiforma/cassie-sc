@@ -126,7 +126,7 @@
                                     (list '/ left right)))
         :else (let [op (AST/value root)
                     child (map partial-evaluate (children root))
-                    numerical-child (reduce (eval op) (filter #(and (leaf? %) (number? %))
+                    numerical-child (apply (eval op) (filter #(and (leaf? %) (number? %))
                                               child))
                     other-children (filter #(not (and (leaf? %) (number? %)))
                                            child)]

@@ -9,26 +9,26 @@
     (concat
       (take n coll)
       (drop (inc n) coll)))
-  (identity (cond (= 'x root) 1
-         (leaf? root) 0
-         :else (let [nchildren (map differentiate (children root) (repeat (count (children root))
-                                                                          x))]
-                 (cond
-                   (= (AST/value root) '+) (cons (AST/value root) nchildren)
-                   (= (AST/value root) '*) (cons '+
-                                                 (map-indexed
-                                                   (fn [idx y]
-                                                     (cons '*
-                                                           (cons y
-                                                                 (drop-nth (children root) idx))))
-                                                   nchildren))
-                   ;; assuming exponent is constant
-                   (= (AST/value root) 'expt) (cons '* (list
-                                                         (cons '* (list (right-child root)
-                                                                        (cons 'expt (list (left-child root)
-                                                                                          (cons '- (list (right-child root)
-                                                                                                         1))))))
-                                                         (differentiate (left-child root) x))))))))
+  (simplify/simplify (simplify/simplify (cond (= 'x root) 1
+                            (leaf? root) 0
+                            :else (let [nchildren (map differentiate (children root) (repeat (count (children root))
+                                                                                             x))]
+                                    (cond
+                                      (= (AST/value root) '+) (cons (AST/value root) nchildren)
+                                      (= (AST/value root) '*) (cons '+
+                                                                    (map-indexed
+                                                                      (fn [idx y]
+                                                                        (cons '*
+                                                                              (cons y
+                                                                                    (drop-nth (children root) idx))))
+                                                                      nchildren))
+                                      ;; assuming exponent is constant
+                                      (= (AST/value root) 'expt) (cons '* (list
+                                                                            (cons '* (list (right-child root)
+                                                                                           (cons 'expt (list (left-child root)
+                                                                                                             (cons '- (list (right-child root)
+                                                                                                                            1))))))
+                                                                            (differentiate (left-child root) x)))))))))
 (defn simpsons [root x n a b]
   (format "%.3f" (let [h (/ (float (- b a)) n)
          f #(AST/evaluate (AST/substitute root x %))]
