@@ -23,6 +23,8 @@
                           arg2 (if (> (count args) 3)
                                  (read-string (nth args 3))
                                  nil)]
+                      (println input)
+                      (println operation)
                       (case operation
                         "simplify" (simplify/clean input)
                         "differentiate" (calculus/differentiate input 'x)
@@ -34,5 +36,5 @@
                         "minus" (simplify/simplify (list '- input arg1))
                         "plus" (simplify/simplify (list '+ input arg1))
                         "expt" (simplify/simplify (list 'expt input arg1))
+                        "foo" (roots/make-guess input 'x 5)
                         nil))))))
-;(-main "(- (expt x 2) 2)" "newton-raphson")
